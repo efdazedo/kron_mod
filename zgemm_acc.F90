@@ -1,29 +1,30 @@
-      subroutine zgemm(transA,transB, m,n,kk, &
+      subroutine zgemm(transA,transB, m,n,kk,                            &
      &   alpha,A,lda,B,ldb,beta,C,ldc)
 #ifdef _OPENACC
 !$acc routine vector
 #else
 !$omp declare target 
 #endif
+      use prec_mod
       implicit none
       integer, value :: m,n,kk,lda,ldb,ldc
-      complex*16, value :: alpha,beta
+      complex(kind=dp), value :: alpha,beta
       character, value :: transA, transB
 
-      complex*16, intent(in) :: A(lda,*)
-      complex*16, intent(in) :: B(ldb,*)
-      complex*16, intent(inout) :: C(ldc,*)
+      complex(kind=dp), intent(in) :: A(lda,*)
+      complex(kind=dp), intent(in) :: B(ldb,*)
+      complex(kind=dp), intent(inout) :: C(ldc,*)
 
       integer, parameter :: nb = 64
       integer :: i,j,k
-      complex*16 :: cij, aik, bkj
+      complex(kind=dp) :: cij, aik, bkj
       logical :: is_Aconj,is_Atrans,is_AN,no_transA
       logical :: is_Bconj,is_Btrans,is_BN,no_transB
 
       is_Aconj = (transA.eq.'C').or.(transA.eq.'c')
       is_Bconj = (transB.eq.'C').or.(transB.eq.'c')
       is_Atrans = (transA.eq.'T').or.(transA.eq.'t')
-      is_Btrans = (transB.eq.'t').or.(transB.eq.'t')
+      is_Btrans = (transB.eq.'T').or.(transB.eq.'t')
 
       is_AN = (transA.eq.'N').or.(transA.eq.'n')
       is_BN = (transB.eq.'N').or.(transB.eq.'n')
