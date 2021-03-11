@@ -25,7 +25,7 @@
           ld2 = size(X,1)
           ld3 = size(Y,1)
 #ifdef _OPENACC
-!$acc  data copyin(A1,X) copyout(Y) &
+!$acc  data copyin(A1,X) copyout(Y)                                      &
 !$acc& copyin(alpha,beta,mm,nn,kk,ld1,ld2,ld3)
 #elif OMP_TARGET
 !$omp target data map(to:A1,X) map(from:Y)                               &

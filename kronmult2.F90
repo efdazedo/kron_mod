@@ -62,8 +62,8 @@
 #endif
       do i=1,nvec
          call zgemm( 'N', 'T', mm,nn,kk,                                 &
-     &     alpha, X(:,i), ld1, A1, ld2,                                  &
-     &     beta, W(:,i), ld3 )
+     &     alpha, X(1,i), ld1, A1, ld2,                                  &
+     &     beta, W(1,i), ld3 )
       enddo
 #ifdef _OPENACC
 !$acc end kernels
