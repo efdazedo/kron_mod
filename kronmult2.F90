@@ -32,9 +32,9 @@
          mm = ncol2
          nn = nrow1
          kk = ncol1
-         ld1 = ncol2
+         ld1 = mm
          ld2 = ldA1
-         ld3 = ncol2
+         ld3 = mm
          alpha = 1
          beta = 0
          call zgemm( 'N', 'T', mm,nn,kk,                                 &
@@ -43,11 +43,11 @@
       enddo
 
 !  ----------------------
-!  Y = kronmult1( A2, W )
+!  Y(1:nrow2,1:nv) = kronmult1( A2(1:nrow2,1:ncol2), W(1:ncol2,1:nv))
 !  ----------------------
       nv = nvec * nrow1
-      call kronmult1( nrow2, ncol2, nv, A2, ldA2,                         &
-     &         W, Y )
+      call kronmult1( nrow2, ncol2, A2, ldA2,                            &
+     &         nv, W, Y )
 
       return
       end subroutine kronmult2

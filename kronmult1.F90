@@ -1,4 +1,4 @@
-       subroutine kronmult1( nrow1,ncol1,nvec,A1,ldA1,X,Y)
+       subroutine kronmult1( nrow1,ncol1,A1,ldA1,  nvec,X,Y)
 #ifdef _OPENACC
 !$acc routine worker
 #else
@@ -9,7 +9,7 @@
 !      compute Y = A1 * X
 !      ------------------
        integer, intent(in) :: nrow1, ncol1, nvec, ldA1
-       complex*16, intent(in) :: A1(ldA1,*)
+       complex*16, intent(in) :: A1(ldA1,ncol1)
        complex*16, intent(in) :: X(ncol1,nvec) 
        complex*16, intent(inout) :: Y(nrow1,nvec) 
 

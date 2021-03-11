@@ -30,9 +30,9 @@
         kk = ncol1
         alpha = 1
         beta = 0
-        ld1 = ncol3*ncol2
+        ld1 = mm
         ld2 = ldA1
-        ld3 = ncol3*ncol2
+        ld3 = mm
         call zgemm('N','T',mm,nn,kk,                                     &
      &         alpha, X(1,i),ld1, A1, ld2,                               &
      &         beta, W(1,i), ld3 )
