@@ -2,22 +2,23 @@
      &                     nrow2,ncol2,A2,ldA2,                          &
      &                     nrow3,ncol3,A3,ldA3,                          &
      &                     nvec, X, Y )
+      use prec_mod
       implicit none
       integer, value :: nrow1,ncol1,ldA1
       integer, value :: nrow2,ncol2,ldA2
       integer, value :: nrow3,ncol3,ldA3
       integer, value :: nvec
 
-      complex*16, intent(in) :: A1(ldA1,ncol1)
-      complex*16, intent(in) :: A2(ldA2,ncol2)
-      complex*16, intent(in) :: A3(ldA3,ncol3)
-      complex*16, intent(in) :: X(ncol3*ncol2*ncol1,nvec)
-      complex*16, intent(inout) :: Y(nrow3*nrow2*nrow1,nvec)
+      complex(kind=dp), intent(in) :: A1(ldA1,ncol1)
+      complex(kind=dp), intent(in) :: A2(ldA2,ncol2)
+      complex(kind=dp), intent(in) :: A3(ldA3,ncol3)
+      complex(kind=dp), intent(in) :: X(ncol3*ncol2*ncol1,nvec)
+      complex(kind=dp), intent(inout) :: Y(nrow3*nrow2*nrow1,nvec)
 
       integer :: i,nv
       integer :: mm,nn,kk,ld1,ld2,ld3
-      complex*16 :: alpha, beta
-      complex*16 :: W(ncol3*ncol2*nrow1,nvec)
+      complex(kind=dp) :: alpha, beta
+      complex(kind=dp) :: W(ncol3*ncol2*nrow1,nvec)
 
 ! ---------------------------------------------
 ! for i=1:nvec
@@ -25,8 +26,17 @@
 !   where Xi = reshape(X(:,i), [ncol3*ncol2, ncol1])
 !       Wi = reshape(W(:,i), [ncol3*ncol2, nrow1])
 ! ---------------------------------------------
+
 #ifdef _OPENACC
-!$acc kernels
+!$acc data copyin(A1,A2,A3,X)  copyout(Y)
+#elif OMP_TARGET
+!$omp target data map(to:A1,A2,A3,X) map(from:Y)
+#endif
+
+
+
+#ifdef _OPENACC
+!$acc kernels present(X,A1,W)
 !$acc loop gang                                                          &
 !$acc& private(mm,nn,kk,alpha,beta,ld1,ld3,ld3)
 #elif OMP_TARGET
@@ -67,5 +77,11 @@
      &                nrow3, ncol3, A3, ldA3,                            &
      &                nv,                                                &
      &                W, Y )
+
+#ifdef _OPENACC
+!$acc end data
+#elif OMP_TARGET
+!$omp end target data 
+#endif
       return
       end subroutine kronmult3

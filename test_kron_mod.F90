@@ -1,4 +1,5 @@
       program test_kron_mod
+      use prec_mod
       use kron_mod
       implicit none
 
@@ -7,11 +8,11 @@
       integer :: nrow3,ncol3,ldA3
       integer :: nvec
 
-      complex*16, allocatable :: X(:,:), Y(:,:), Y_simple(:,:)
-      complex*16, allocatable :: A1(:,:)
-      complex*16, allocatable :: A2(:,:)
-      complex*16, allocatable :: A3(:,:)
-      real*8 :: max_err
+      complex(kind=dp), allocatable :: X(:,:), Y(:,:), Y_simple(:,:)
+      complex(kind=dp), allocatable :: A1(:,:)
+      complex(kind=dp), allocatable :: A2(:,:)
+      complex(kind=dp), allocatable :: A3(:,:)
+      real(kind=dp) :: max_err, x_norm, y_norm
 
       nrow1 = 5
       ncol1 = 6
@@ -46,14 +47,14 @@
 !$omp target data map(to:X) map(from:Y,Y_simple)
 #endif
 
-      call kronmult3(nrow1,ncol1,A1,ldA1, &
-     &               nrow2,ncol2,A2,ldA2, &
-     &               nrow3,ncol3,A3,ldA3, &
+      call kronmult3(nrow1,ncol1,A1,ldA1,                                &
+     &               nrow2,ncol2,A2,ldA2,                                &
+     &               nrow3,ncol3,A3,ldA3,                                &
      &               nvec, X, Y )
 
-      call kronmult3_simple(nrow1,ncol1,A1,ldA1, &
-     &                      nrow2,ncol2,A2,ldA2, &
-     &                      nrow3,ncol3,A3,ldA3, &
+      call kronmult3_simple(nrow1,ncol1,A1,ldA1,                         &
+     &                      nrow2,ncol2,A2,ldA2,                         &
+     &                      nrow3,ncol3,A3,ldA3,                         &
      &                      nvec, X, Y_simple )
 
 #ifdef _OPENACC
@@ -65,8 +66,12 @@
 ! -------------
 ! check results
 ! -------------
+       x_norm = maxval( abs(X) )
+       y_norm = maxval( abs(Y) )
+
        max_err = maxval( abs(Y - Y_simple) )
        print*,'max_err = ', max_err
+       print*,'x_norm, y_norm ', x_norm, y_norm
        stop
        end program test_kron_mod
 

@@ -1,10 +1,11 @@
       subroutine crandom(A)
+      use prec_mod
       implicit none
-      complex*16, intent(inout) :: A(:,:)
+      complex(kind=dp), intent(inout) :: A(:,:)
 
       integer :: j
-      real*8 :: Ar(size(A,1))
-      real*8 :: Ac(size(A,1))
+      real(kind=dp) :: Ar(size(A,1))
+      real(kind=dp) :: Ac(size(A,1))
 
       do j=1,size(A,2)
         call random_number(Ar)

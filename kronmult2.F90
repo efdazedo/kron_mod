@@ -7,42 +7,28 @@
 ! for each i
 !    Yi = A2 * Xi * transpose(A1)
 ! ---------------------------------------------------------
+      use prec_mod
       implicit none
       integer, value :: nrow1,ncol1,ldA1
       integer, value :: nrow2,ncol2,ldA2
       integer, value :: nvec
 
-      complex*16, intent(in) :: A1(ldA1,ncol1)
-      complex*16, intent(in) :: A2(ldA2,ncol2)
-      complex*16, intent(in) :: X(ncol2*ncol1,nvec)
-      complex*16, intent(inout) :: Y(nrow2*nrow1,nvec)
+      complex(kind=dp), intent(in) :: A1(ldA1,ncol1)
+      complex(kind=dp), intent(in) :: A2(ldA2,ncol2)
+      complex(kind=dp), intent(in) :: X(ncol2*ncol1,nvec)
+      complex(kind=dp), intent(inout) :: Y(nrow2*nrow1,nvec)
 
-      complex*16 :: W( ncol2*nrow1, nvec )
+      complex(kind=dp) :: W( ncol2*nrow1, nvec )
 
       integer :: i, nv
       integer :: mm,nn,kk,ld1,ld2,ld3
-      complex*16 :: alpha,beta
+      complex(kind=dp) :: alpha,beta
 
 ! -------------------------------
 ! perform Wi = Xi * transpose(A1)
 ! Xi = reshape( X(:,i), [ncol2,ncol1])
 ! Wi = reshape( W(:,i), [ncol2,nrow1])
 ! -------------------------------
-
-#ifdef _OPENACC
-!$acc kernels
-!$acc loop gang                                                          &
-!$acc& private(mm,nn,kk,alpha,beta,ld1,ld3,ld3)
-#elif OMP_TARGET
-!$omp target teams 
-!$omp distribute                                                         &
-!$omp& private(mm,nn,kk,alpha,beta,ld1,ld3,ld3)
-#else
-!$omp parallel 
-!$omp do                                                        &
-!$omp& private(mm,nn,kk,alpha,beta,ld1,ld3,ld3)
-#endif
-      do i=1,nvec
          mm = ncol2
          nn = nrow1
          kk = ncol1
@@ -51,9 +37,33 @@
          ld3 = mm
          alpha = 1
          beta = 0
+
+#ifdef _OPENACC
+!$acc data copyin(A1,A2,X) create(W) copyout(Y)                          &
+!$acc& copyin(mm,nn,kk,ld1,ld2,ld3,alpha,beta)
+#elif OMP_TARGET
+!$omp target data map(to:A1,A2,X) map(alloc:W) map(from:Y)               &
+!$omp& map(to:mm,nn,kk,ld1,ld2,ld3,alpha,beta)
+#endif
+
+
+
+
+#ifdef _OPENACC
+!$acc kernels present(A1,X,W)
+!$acc loop gang                                                           
+#elif OMP_TARGET
+!$omp target teams 
+!$omp distribute                                                          
+#else
+!$omp  parallel  shared(A1,X,W)                                         &
+!$omp& firstprivate(mm,nn,kk,ld1,ld2,ld3,alpha,beta)
+!$omp do                                                          
+#endif
+      do i=1,nvec
          call zgemm( 'N', 'T', mm,nn,kk,                                 &
-     &     alpha, X(1,i), ld1, A1, ld2,                                  &
-     &     beta, W(1,i), ld3 )
+     &     alpha, X(:,i), ld1, A1, ld2,                                  &
+     &     beta, W(:,i), ld3 )
       enddo
 #ifdef _OPENACC
 !$acc end kernels
@@ -70,5 +80,12 @@
       call kronmult1( nrow2, ncol2, A2, ldA2,                            &
      &         nv, W, Y )
 
+
+
+#ifdef _OPENACC
+!$acc end data
+#elif OMP_TARGET
+!$omp end target data
+#endif
       return
       end subroutine kronmult2
