@@ -1,14 +1,15 @@
       subroutine zgemm(transA,transB, m,n,kk, &
      &   alpha,A,lda,B,ldb,beta,C,ldc)
 #ifdef _OPENACC
-!$acc loop worker
+!$acc routine vector
 #else
 !$omp declare target 
 #endif
       implicit none
-      integer, intent(in) :: m,n,kk,lda,ldb,ldc
-      complex*16, intent(in) :: alpha,beta
-      character, intent(in) :: transA, transB
+      integer, value :: m,n,kk,lda,ldb,ldc
+      complex*16, value :: alpha,beta
+      character, value :: transA, transB
+
       complex*16, intent(in) :: A(lda,*)
       complex*16, intent(in) :: B(ldb,*)
       complex*16, intent(inout) :: C(ldc,*)
@@ -35,7 +36,7 @@
 
 
 #ifdef _OPENACC
-!$acc loop worker vector collapse(2) private(cij,aik,bkj,k)
+!$acc loop vector collapse(2) private(cij,aik,bkj,k)
 #else
 !$omp parallel simd collapse(2) private(cij,aik,bkj,k)
 #endif
@@ -47,13 +48,22 @@
           if (no_transA) then
             aik = A(i,k)
           else
-            aik = merge(conj(A(k,i)), A(k,i), is_Aconj)
+            if (is_Aconj) then
+                    aik = conjg(A(k,i))
+            else
+                    aik = A(k,i)
+            endif
           endif
 
           if (no_transB) then
             bkj = B(k,j)
           else
-            bkj = merge(conj(B(j,k)), B(j,k), is_Bconj)
+            bkj = merge(conjg(B(j,k)), B(j,k), is_Bconj)
+            if (is_Bconj) then
+                    bkj = conjg(B(j,k))
+            else
+                    bkj = B(j,k)
+            endif
           endif
 
           cij = cij + aik * bkj

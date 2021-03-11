@@ -14,7 +14,7 @@
 #endif
       contains
 #if defined(_OPENACC) || defined(OMP_TARGET)
-#include "zgemm_cc.F90
+#include "zgemm_acc.F90
 #endif
 #include "crandom.F90"
 #include "kronmult1.F90"

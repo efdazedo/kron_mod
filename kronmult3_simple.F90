@@ -3,10 +3,11 @@
      &                     nrow3,ncol3,A3,ldA3,                          &
      &                     nvec, X, Y )
       implicit none
-      integer, intent(in) :: nrow1,ncol1,ldA1
-      integer, intent(in) :: nrow2,ncol2,ldA2
-      integer, intent(in) :: nrow3,ncol3,ldA3
-      integer, intent(in) :: nvec
+      integer, value :: nrow1,ncol1,ldA1
+      integer, value :: nrow2,ncol2,ldA2
+      integer, value :: nrow3,ncol3,ldA3
+      integer, value :: nvec
+
       complex*16, intent(in) :: A1(ldA1,ncol1)
       complex*16, intent(in) :: A2(ldA2,ncol2)
       complex*16, intent(in) :: A3(ldA3,ncol3)
@@ -20,7 +21,16 @@
 ! Y([i3,i2,i1])=C([i3,i2,i1],[j3,j2,j1])=kron(A1,A2,A3)*X([j3,j2,j1])
 ! -------------------------------------------------------------------
 
-!$acc loop independent gang collapse(4) private(ii,yii)
+#ifdef _OPENACC
+!$acc kernels
+!$acc loop independent gang vector collapse(4) private(ii,yii)
+#elif OMP_TARGET
+!$omp target teams
+!$omp distribute  parallel simd collapse(4) private(ii,yii)
+#else
+!$omp parallel 
+!$omp do collapse(4) private(ii,yii)
+#endif
       do i=1,nvec
       do i1=1,nrow1
       do i2=1,nrow2
@@ -28,9 +38,6 @@
 
         ii = i3 + (i2-1)*nrow3 + (i1-1)*(nrow3*nrow2)
         yii = 0
-
-!$acc  loop independent vector collapse(3) &
-!$acc& reduction(+:jii) private(jj,xjj,c_ii_jj)
         do j1=1,ncol1
         do j2=1,ncol2
         do j3=1,ncol3
@@ -50,6 +57,14 @@
       enddo
       enddo
       enddo
+
+#ifdef _OPENACC
+!$acc end kernels
+#elif OMP_TARGET
+!$omp end target teams
+#else
+!$omp end parallel
+#endif
 
       return
       end subroutine kronmult3_simple

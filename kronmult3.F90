@@ -3,10 +3,11 @@
      &                     nrow3,ncol3,A3,ldA3,                          &
      &                     nvec, X, Y )
       implicit none
-      integer, intent(in) :: nrow1,ncol1,ldA1
-      integer, intent(in) :: nrow2,ncol2,ldA2
-      integer, intent(in) :: nrow3,ncol3,ldA3
-      integer, intent(in) :: nvec
+      integer, value :: nrow1,ncol1,ldA1
+      integer, value :: nrow2,ncol2,ldA2
+      integer, value :: nrow3,ncol3,ldA3
+      integer, value :: nvec
+
       complex*16, intent(in) :: A1(ldA1,ncol1)
       complex*16, intent(in) :: A2(ldA2,ncol2)
       complex*16, intent(in) :: A3(ldA3,ncol3)
@@ -24,6 +25,19 @@
 !   where Xi = reshape(X(:,i), [ncol3*ncol2, ncol1])
 !       Wi = reshape(W(:,i), [ncol3*ncol2, nrow1])
 ! ---------------------------------------------
+#ifdef _OPENACC
+!$acc kernels
+!$acc loop gang                                                          &
+!$acc& private(mm,nn,kk,alpha,beta,ld1,ld3,ld3)
+#elif OMP_TARGET
+!$omp target teams 
+!$omp distribute                                                         &
+!$omp& private(mm,nn,kk,alpha,beta,ld1,ld3,ld3)
+#else
+!$omp parallel 
+!$omp do                                                        &
+!$omp& private(mm,nn,kk,alpha,beta,ld1,ld3,ld3)
+#endif
       do i=1,nvec
         mm = ncol3*ncol2
         nn = nrow1
@@ -37,6 +51,13 @@
      &         alpha, X(1,i),ld1, A1, ld2,                               &
      &         beta, W(1,i), ld3 )
       enddo
+#ifdef _OPENACC
+!$acc end kernels
+#elif OMP_TARGET
+!$omp end target teams
+#else
+!$omp end parallel
+#endif
 
 ! ---------------------------
 ! compute Y = kron(A2,A3) * W
