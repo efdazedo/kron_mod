@@ -25,7 +25,7 @@
           ld3 = size(Y,1)
 #ifdef _OPENACC
 !$acc kernels
-!$acc loop gang collapse(2) private(iend,jend,isize,jsize)
+!$acc loop independent gang collapse(2) private(iend,jend,isize,jsize)
 #elif OMP_TARGET
 !$omp target teams
 !$omp distribute collapse(2) private(iend,jend,isize,jsize)
