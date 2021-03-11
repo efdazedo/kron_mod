@@ -23,9 +23,9 @@
 #include "kronmult1.F90"
 #include "kronmult2.F90"
 #include "kronmult3.F90"
+#include "kronmult3_simple.F90"
 
 #if (0)
-#include "kronmult3_simple.F90"
 #endif
 
       end module kron_mod
