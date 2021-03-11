@@ -38,7 +38,7 @@
 #ifdef _OPENACC
 !$acc loop vector collapse(2) private(cij,aik,bkj,k)
 #else
-!$omp parallel simd collapse(2) private(cij,aik,bkj,k)
+!$omp loop collapse(2) private(cij,aik,bkj,k)
 #endif
       do j=1,n
       do i=1,m
@@ -58,7 +58,6 @@
           if (no_transB) then
             bkj = B(k,j)
           else
-            bkj = merge(conjg(B(j,k)), B(j,k), is_Bconj)
             if (is_Bconj) then
                     bkj = conjg(B(j,k))
             else

@@ -26,7 +26,7 @@
 !$acc loop independent gang vector collapse(4) private(ii,yii)
 #elif OMP_TARGET
 !$omp target teams
-!$omp distribute  parallel simd collapse(4) private(ii,yii)
+!$omp parallel do simd collapse(4) private(ii,yii)
 #else
 !$omp parallel 
 !$omp do collapse(4) private(ii,yii)
