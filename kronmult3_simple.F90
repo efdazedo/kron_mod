@@ -30,11 +30,11 @@
 #ifdef _OPENACC
 !$acc  kernels
 !$acc  loop independent gang vector collapse(4)                          &
-!$acc& private(ii,yii,jj,xjj,c_ii_jj)
+!$acc& private(ii,yii,jj,xjj,c_ii_jj, j1,j2,j3)
 #elif OMP_TARGET
 !$omp  target teams
 !$omp  parallel do simd collapse(4)                                      &
-!$omp& private(ii,yii,jj,xjj,c_ii_jj)
+!$omp& private(ii,yii,jj,xjj,c_ii_jj, j1,j2,j3)
 #else
 !$omp parallel 
 !$omp do collapse(4)                                                     &
