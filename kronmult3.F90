@@ -38,15 +38,15 @@
 #ifdef _OPENACC
 !$acc kernels present(X,A1,W)
 !$acc loop gang                                                          &
-!$acc& private(mm,nn,kk,alpha,beta,ld1,ld3,ld3)
+!$acc& private(mm,nn,kk,alpha,beta,ld1,ld2,ld3)
 #elif OMP_TARGET
 !$omp target teams 
 !$omp distribute                                                         &
-!$omp& private(mm,nn,kk,alpha,beta,ld1,ld3,ld3)
+!$omp& private(mm,nn,kk,alpha,beta,ld1,ld2,ld3)
 #else
 !$omp parallel 
 !$omp do                                                        &
-!$omp& private(mm,nn,kk,alpha,beta,ld1,ld3,ld3)
+!$omp& private(mm,nn,kk,alpha,beta,ld1,ld2,ld3)
 #endif
       do i=1,nvec
         mm = ncol3*ncol2
