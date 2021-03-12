@@ -34,16 +34,16 @@
       allocate( Y(nrow3*nrow2*nrow1,nvec) )
       allocate( Y_simple(nrow3*nrow2*nrow1,nvec) )
 
-#ifdef USE_COMPLEX
-      call crandom(X)
-      call crandom(A1)
-      call crandom(A2)
-      call crandom(A3)
-#else
+#ifdef USE_DOUBLE
       call random_number(X)
       call random_number(A1)
       call random_number(A2)
       call random_number(A3)
+#else
+      call crandom(X)
+      call crandom(A1)
+      call crandom(A2)
+      call crandom(A3)
 #endif
 
       Y(:,:) = 0
