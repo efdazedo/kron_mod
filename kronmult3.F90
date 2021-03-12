@@ -9,16 +9,16 @@
       integer, value :: nrow3,ncol3,ldA3
       integer, value :: nvec
 
-      complex(kind=dp), intent(in) :: A1(ldA1,ncol1)
-      complex(kind=dp), intent(in) :: A2(ldA2,ncol2)
-      complex(kind=dp), intent(in) :: A3(ldA3,ncol3)
-      complex(kind=dp), intent(in) :: X(ncol3*ncol2*ncol1,nvec)
-      complex(kind=dp), intent(inout) :: Y(nrow3*nrow2*nrow1,nvec)
+      ZTYPE, intent(in) :: A1(ldA1,ncol1)
+      ZTYPE, intent(in) :: A2(ldA2,ncol2)
+      ZTYPE, intent(in) :: A3(ldA3,ncol3)
+      ZTYPE, intent(in) :: X(ncol3*ncol2*ncol1,nvec)
+      ZTYPE, intent(inout) :: Y(nrow3*nrow2*nrow1,nvec)
 
       integer :: i,nv
       integer :: mm,nn,kk,ld1,ld2,ld3
-      complex(kind=dp) :: alpha, beta
-      complex(kind=dp) :: W(ncol3*ncol2*nrow1,nvec)
+      ZTYPE :: alpha, beta
+      ZTYPE :: W(ncol3*ncol2*nrow1,nvec)
 
 ! ---------------------------------------------
 ! for i=1:nvec
@@ -28,9 +28,9 @@
 ! ---------------------------------------------
 
 #ifdef _OPENACC
-!$acc data copyin(A1,A2,A3,X)  copyout(Y)
+!$acc data pcopyin(A1,A2,A3,X)  pcopyout(Y) create(W)
 #elif OMP_TARGET
-!$omp target data map(to:A1,A2,A3,X) map(from:Y)
+!$omp target data map(to:A1,A2,A3,X) map(from:Y) map(alloc:W)
 #endif
 
 
@@ -57,7 +57,7 @@
         ld1 = mm
         ld2 = ldA1
         ld3 = mm
-        call zgemm('N','T',mm,nn,kk,                                     &
+        call GEMM('N','T',mm,nn,kk,                                     &
      &         alpha, X(1,i),ld1, A1, ld2,                               &
      &         beta, W(1,i), ld3 )
       enddo
