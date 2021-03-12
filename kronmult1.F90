@@ -43,8 +43,7 @@
 !$omp distribute collapse(2)                                              &
 !$omp& private(iend,jend,isize,jsize)
 #else
-!$omp  parallel  
-!$omp  do shared(A1,X,Y,mm,nn,kk,alpha,beta,ld1,ld2,ld3)  &
+!$omp  parallel  do shared(A1,X,Y,mm,nn,kk,alpha,beta,ld1,ld2,ld3)        &
 !$omp& private(iend,jend,isize,jsize)
 #endif
           do jstart=1,nn,nb
@@ -65,7 +64,7 @@
 #elif OMP_TARGET
 !$omp end target teams
 #else
-!$omp end parallel
+!$omp end parallel do
 #endif
 
 
