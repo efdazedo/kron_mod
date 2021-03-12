@@ -1,4 +1,4 @@
-      subroutine zgemm(transA,transB, m,n,kk,                            &
+      subroutine GEMM(transA,transB, m,n,kk,                            &
      &   alpha,A,lda,B,ldb,beta,C,ldc)
 #ifdef _OPENACC
 !$acc routine vector
@@ -8,16 +8,16 @@
       use prec_mod
       implicit none
       integer, value :: m,n,kk,lda,ldb,ldc
-      complex(kind=dp), value :: alpha,beta
+      ZTYPE, value :: alpha,beta
       character, value :: transA, transB
 
-      complex(kind=dp), intent(in) :: A(lda,*)
-      complex(kind=dp), intent(in) :: B(ldb,*)
-      complex(kind=dp), intent(inout) :: C(ldc,*)
+      ZTYPE, intent(in) :: A(lda,*)
+      ZTYPE, intent(in) :: B(ldb,*)
+      ZTYPE, intent(inout) :: C(ldc,*)
 
       integer, parameter :: nb = 64
       integer :: i,j,k
-      complex(kind=dp) :: cij, aik, bkj
+      ZTYPE :: cij, aik, bkj
       logical :: is_Aconj,is_Atrans,is_AN,no_transA
       logical :: is_Bconj,is_Btrans,is_BN,no_transB
 
@@ -80,4 +80,4 @@
 
 
        return
-       end subroutine zgemm
+       end subroutine GEMM

@@ -1,3 +1,4 @@
+#include "common.h"
       program test_kron_mod
       use prec_mod
       use kron_mod
@@ -8,10 +9,10 @@
       integer :: nrow3,ncol3,ldA3
       integer :: nvec
 
-      complex(kind=dp), allocatable :: X(:,:), Y(:,:), Y_simple(:,:)
-      complex(kind=dp), allocatable :: A1(:,:)
-      complex(kind=dp), allocatable :: A2(:,:)
-      complex(kind=dp), allocatable :: A3(:,:)
+      ZTYPE, allocatable :: X(:,:), Y(:,:), Y_simple(:,:)
+      ZTYPE, allocatable :: A1(:,:)
+      ZTYPE, allocatable :: A2(:,:)
+      ZTYPE, allocatable :: A3(:,:)
       real(kind=dp) :: max_err, x_norm, y_norm
 
       nrow1 = 5
@@ -33,18 +34,25 @@
       allocate( Y(nrow3*nrow2*nrow1,nvec) )
       allocate( Y_simple(nrow3*nrow2*nrow1,nvec) )
 
+#ifdef USE_COMPLEX
       call crandom(X)
       call crandom(A1)
       call crandom(A2)
       call crandom(A3)
+#else
+      call random_number(X)
+      call random_number(A1)
+      call random_number(A2)
+      call random_number(A3)
+#endif
 
       Y(:,:) = 0
       Y_simple(:,:) = 0
 
 #ifdef _OPENACC
-!$acc data copyin(X) copyout(Y,Y_simple)
+!$acc data copyin(X,A1,A2,A3) copyout(Y,Y_simple)
 #elif OMP_TARGET
-!$omp target data map(to:X) map(from:Y,Y_simple)
+!$omp target data map(to:X,A1,A2,A3) map(from:Y,Y_simple)
 #endif
 
       call kronmult3(nrow1,ncol1,A1,ldA1,                                &

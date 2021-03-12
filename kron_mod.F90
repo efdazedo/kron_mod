@@ -1,17 +1,18 @@
+#include "common.h"
       module kron_mod
       use prec_mod
       implicit none
 #if defined(_OPENACC) || defined(OMP_TARGET)
 #else
       interface
-      subroutine zgemm(transA,transB,m,n,k,alpha,A,lda,B,ldb,beta,C,ldc)
+      subroutine GEMM(transA,transB,m,n,k,alpha,A,lda,B,ldb,beta,C,ldc)
       use prec_mod
       implicit none
       character transA,transB
       integer m,n,k,lda,ldb,ldc
-      complex(kind=dp) alpha, beta
-      complex(kind=dp) A(lda,*),B(ldb,*),C(ldc,*)
-      end subroutine zgemm
+      ZTYPE alpha, beta
+      ZTYPE A(lda,*),B(ldb,*),C(ldc,*)
+      end subroutine GEMM
       end interface
 #endif
       contains

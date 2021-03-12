@@ -13,16 +13,16 @@
       integer, value :: nrow2,ncol2,ldA2
       integer, value :: nvec
 
-      complex(kind=dp), intent(in) :: A1(ldA1,ncol1)
-      complex(kind=dp), intent(in) :: A2(ldA2,ncol2)
-      complex(kind=dp), intent(in) :: X(ncol2*ncol1,nvec)
-      complex(kind=dp), intent(inout) :: Y(nrow2*nrow1,nvec)
+      ZTYPE, intent(in) :: A1(ldA1,ncol1)
+      ZTYPE, intent(in) :: A2(ldA2,ncol2)
+      ZTYPE, intent(in) :: X(ncol2*ncol1,nvec)
+      ZTYPE, intent(inout) :: Y(nrow2*nrow1,nvec)
 
-      complex(kind=dp) :: W( ncol2*nrow1, nvec )
+      ZTYPE :: W( ncol2*nrow1, nvec )
 
       integer :: i, nv
       integer :: mm,nn,kk,ld1,ld2,ld3
-      complex(kind=dp) :: alpha,beta
+      ZTYPE :: alpha,beta
 
 ! -------------------------------
 ! perform Wi = Xi * transpose(A1)
@@ -39,7 +39,7 @@
          beta = 0
 
 #ifdef _OPENACC
-!$acc data copyin(A1,A2,X) create(W) copyout(Y)                          &
+!$acc data pcopyin(A1,A2,X) create(W) pcopyout(Y)                        &
 !$acc& copyin(mm,nn,kk,ld1,ld2,ld3,alpha,beta)
 #elif OMP_TARGET
 !$omp target data map(to:A1,A2,X) map(alloc:W) map(from:Y)               &
@@ -61,7 +61,7 @@
 !$omp do                                                          
 #endif
       do i=1,nvec
-         call zgemm( 'N', 'T', mm,nn,kk,                                 &
+         call GEMM( 'N', 'T', mm,nn,kk,                                  &
      &     alpha, X(1,i), ld1, A1, ld2,                                  &
      &     beta, W(1,i), ld3 )
       enddo
