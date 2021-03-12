@@ -9,18 +9,20 @@
       integer, value :: nrow3,ncol3,ldA3
       integer, value :: nvec
 
-      complex(kind=dp), intent(in) :: A1(ldA1,ncol1)
-      complex(kind=dp), intent(in) :: A2(ldA2,ncol2)
-      complex(kind=dp), intent(in) :: A3(ldA3,ncol3)
-      complex(kind=dp), intent(in) :: X(ncol3*ncol2*ncol1,nvec)
-      complex(kind=dp), intent(inout) :: Y(nrow3*nrow2*nrow1,nvec)
+      ZTYPE, intent(in) :: A1(ldA1,ncol1)
+      ZTYPE, intent(in) :: A2(ldA2,ncol2)
+      ZTYPE, intent(in) :: A3(ldA3,ncol3)
+      ZTYPE, intent(in) :: X(ncol3*ncol2*ncol1,nvec)
+      ZTYPE, intent(inout) :: Y(nrow3*nrow2*nrow1,nvec)
 
       integer :: i1,i2,i3, j1,j2,j3
       integer :: i, ii,jj
-      complex(kind=dp) :: yii, xjj, c_ii_jj
+      ZTYPE :: yii, xjj, c_ii_jj
 ! -------------------------------------------------------------------
 ! Y([i3,i2,i1])=C([i3,i2,i1],[j3,j2,j1])=kron(A1,A2,A3)*X([j3,j2,j1])
 ! -------------------------------------------------------------------
+       i = 0
+
 #ifdef _OPENACC
 !$acc data copyin(A1,A2,A3,X) copyout(Y)
 #elif OMP_TARGET
