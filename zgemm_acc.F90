@@ -39,7 +39,7 @@
 #ifdef _OPENACC
 !$acc loop vector collapse(2) private(cij,aik,bkj,k)
 #else
-!$omp loop collapse(2) private(cij,aik,bkj,k)
+!$omp parallel do simd collapse(2) private(cij,aik,bkj,k)
 #endif
       do j=1,n
       do i=1,m
