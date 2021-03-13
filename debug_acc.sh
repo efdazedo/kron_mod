@@ -2,7 +2,12 @@
 touch test_kron_mod_acc
 rm test_kron_mod_acc
 
+echo "=== OpenMP CPU ==="
+nvfortran -fast -mp -o test_kron_mod_serial \
+        prec_mod.F90 kron_mod.F90 test_kron_mod.F90 -lblas
+
 nvfortran -UUSE_DOUBLE -cpp -E -F -UOMP_TARGET -D_OPENACC kron_mod.F90 > kron_mod.f90
+
 
 echo "=== with -Minline ==== "
 nvfortran -UUSE_DOUBLE  -Mstandard -Mfixed  \
