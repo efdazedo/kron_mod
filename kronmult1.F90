@@ -4,7 +4,7 @@
 !      ------------------
 !      compute Y = A1 * X
 !      ------------------
-       integer, value :: nrow1, ncol1, nvec, ldA1
+       integer, intent(in) :: nrow1, ncol1, nvec, ldA1
 
        ZTYPE, intent(in) :: A1(ldA1,ncol1)
        ZTYPE, intent(in) :: X(ncol1,nvec) 

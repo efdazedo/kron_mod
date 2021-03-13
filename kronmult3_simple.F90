@@ -4,10 +4,10 @@
      &                     nvec, X, Y )
       use prec_mod
       implicit none
-      integer, value :: nrow1,ncol1,ldA1
-      integer, value :: nrow2,ncol2,ldA2
-      integer, value :: nrow3,ncol3,ldA3
-      integer, value :: nvec
+      integer, intent(in) :: nrow1,ncol1,ldA1
+      integer, intent(in) :: nrow2,ncol2,ldA2
+      integer, intent(in) :: nrow3,ncol3,ldA3
+      integer, intent(in) :: nvec
 
       ZTYPE, intent(in) :: A1(ldA1,ncol1)
       ZTYPE, intent(in) :: A2(ldA2,ncol2)

@@ -7,9 +7,9 @@
 #endif
       use prec_mod
       implicit none
-      integer, value :: m,n,kk,lda,ldb,ldc
-      ZTYPE, value :: alpha,beta
-      character, value :: transA, transB
+      integer, intent(in) :: m,n,kk,lda,ldb,ldc
+      ZTYPE, intent(in) :: alpha,beta
+      character, intent(in) :: transA, transB
 
       ZTYPE, intent(in) :: A(lda,*)
       ZTYPE, intent(in) :: B(ldb,*)
