@@ -40,7 +40,7 @@
 #else
 !$omp parallel 
 !$omp do collapse(4)                                                     &
-!$omp& private(ii,yii,jj,xjj,c_ii_jj)
+!$omp& private(ii,yii,jj,xjj,c_ii_jj, j1,j2,j3)
 #endif
       do i=1,nvec
       do i1=1,nrow1
