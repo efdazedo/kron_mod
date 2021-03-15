@@ -1,9 +1,10 @@
+#include "common.h"
       subroutine GEMM(transA,transB, m,n,kk,                            &
      &   alpha,A,lda,B,ldb,beta,C,ldc)
 #ifdef _OPENACC
 !$acc routine vector
 #else
-!$omp declare target 
+!$omp declare target  
 #endif
       use prec_mod
       implicit none
