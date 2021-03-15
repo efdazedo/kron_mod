@@ -54,7 +54,7 @@
 !$acc& pcopyin(nrow1,ncol1,ldA1,nrow2,ncol2,ldA2,nrow3,ncol3,ldA3)
 #elif OMP_TARGET
 !$omp  target data map(to:X,A1,A2,A3) map(from:Y,Y_simple)               &
-!$omp& pcopyin(nrow1,ncol1,ldA1,nrow2,ncol2,ldA2,nrow3,ncol3,ldA3)
+!$omp& map(to:nrow1,ncol1,ldA1,nrow2,ncol2,ldA2,nrow3,ncol3,ldA3)
 #endif
 
       call kronmult3(nrow1,ncol1,A1,ldA1,                                &
