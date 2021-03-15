@@ -16,7 +16,6 @@
       ZTYPE, intent(in) :: B(ldb,*)
       ZTYPE, intent(inout) :: C(ldc,*)
 
-      integer, parameter :: nb = 64
       integer :: i,j,k
       ZTYPE :: cij, aik, bkj
       logical :: is_Aconj,is_Atrans,is_AN,no_transA
