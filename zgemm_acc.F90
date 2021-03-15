@@ -1,13 +1,13 @@
 #include "common.h"
       subroutine GEMM(transA,transB, m,n,kk,                            &
      &   alpha,A,lda,B,ldb,beta,C,ldc)
+      use prec_mod
+      implicit none
 #ifdef _OPENACC
 !$acc routine vector
 #else
 !$omp declare target  
 #endif
-      use prec_mod
-      implicit none
       integer, intent(in) :: m,n,kk,lda,ldb,ldc
       ZTYPE, intent(in) :: alpha,beta
       character, intent(in) :: transA, transB
