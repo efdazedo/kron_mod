@@ -3,6 +3,14 @@ m2 = 5; n2 = 6; A2 = rand(m2,n2);
 m3 = 7; n3 = 8; A3 = rand(m3,n3);
 
 nvec = 2;
+
+X1 = rand(n1,nvec);
+Y1_exact = A1(1:m1,1:n1) * X1;
+Y1 = kronmult1( m1,n1,A1, nvec, X1 );
+err1 = max(abs(Y1(:)-Y1_exact(:)));
+disp(sprintf('err1 = %g ', err1 ));
+
+
 X2 = rand( (n2*n1), nvec );
 Y2_exact = kron(A1,A2) * X2;
 Y2 = kronmult2( m1,n1,A1, m2,n2,A2, nvec, X2 );

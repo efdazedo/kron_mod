@@ -6,6 +6,18 @@ ny = 45;
 nz = 60;
 nvec = 1;
 
+X1 = rand([nx,nvec]);
+Y1 = fft( X1 );
+iY1 = ifft( Y1 );
+
+Y1_kron = fft1d( nx, nvec, iforward, X1 );
+iY1_kron = fft1d( nx, nvec, ibackward, Y1_kron);
+disp(sprintf('norm(Y1-Y1_kron) %g ', ...
+	    max(abs(Y1(:)-Y1_kron(:)))  ));
+
+disp(sprintf('norm(iY1-iY1_kron) %g ', ...
+	    max(abs(iY1(:)-iY1_kron(:) ))  ));
+
 X2 = rand([nx,ny]) + sqrt(-1)*rand([nx,ny]);
 
 Y2 = fft2( X2 );
