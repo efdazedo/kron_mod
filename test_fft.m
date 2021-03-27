@@ -4,7 +4,7 @@ ibackward = -1;
 nx = 60;
 ny = 27;
 nz = 96;
-nvec = 2;
+nvec = 20;
 
 X1 = rand([nx,nvec]);
 Y1 = fft( X1 );
