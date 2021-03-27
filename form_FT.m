@@ -20,11 +20,21 @@ else
 	theta = (2*pi)/n;
 end;
 
-for j=1:n,
-for k=1:n,
-	theta_jk = theta * (j-1)*(k-1);
-	W(k,j) = cos(theta_jk) + sqrt(-1)*sin(theta_jk);
-end;
+use_vec = 1;
+if (use_vec),
+  k = 1:n;
+  for j=1:n,
+    theta_kj = theta * (j-1) * (k-1);
+    W(k,j) = cos(theta_kj) + sqrt(-1)*sin(theta_kj);
+  end;
+else
+
+  for j=1:n,
+  for k=1:n,
+	theta_kj = theta * (j-1)*(k-1);
+	W(k,j) = cos(theta_kj) + sqrt(-1)*sin(theta_kj);
+  end;
+  end;
 end;
 
 if (is_forward),
@@ -35,7 +45,8 @@ else
   % ------------------------------------
   % scale by (1/n) for matlab convention
   % ------------------------------------
-  W(1:n,1:n) = W(1:n,1:n) * (1/n);
+  dscale = (1.0/n);
+  W(1:n,1:n) = dscale * W(1:n,1:n); 
 end;
 
 end
