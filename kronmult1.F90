@@ -14,10 +14,10 @@
        integer :: istart,iend,isize
        integer :: jstart,jend,jsize
        integer :: mm,nn,kk,ld1,ld2,ld3
-       ZTYPE :: alpha, beta
+       ZTYPE, DIMENSION(2) :: alphabeta
 
-          beta = 0
-          alpha = 1
+          alphabeta(1) = 1 ! alpha
+          alphabeta(2) = 0 ! beta
           mm = nrow1
           nn = nvec
           kk = ncol1
@@ -26,10 +26,10 @@
           ld3 = size(Y,1)
 #ifdef _OPENACC
 !$acc  data pcopyin(A1,X) pcopyout(Y)                                      &
-!$acc& pcopyin(alpha,beta,mm,nn,kk,ld1,ld2,ld3)
+!$acc& pcopyin(alphabeta,mm,nn,kk,ld1,ld2,ld3)
 #elif OMP_TARGET
 !$omp target data map(to:A1,X) map(from:Y)                               &
-!$omp& map(to:alpha,beta,mm,nn,kk,ld1,ld2,ld3)
+!$omp& map(to:alphabeta,mm,nn,kk,ld1,ld2,ld3)
 #endif
 
 
@@ -43,7 +43,7 @@
 !$omp distribute collapse(2)                                              &
 !$omp& private(iend,jend,isize,jsize)
 #else
-!$omp  parallel  do shared(A1,X,Y,mm,nn,kk,alpha,beta,ld1,ld2,ld3)        &
+!$omp  parallel  do shared(A1,X,Y,mm,nn,kk,alphabeta,ld1,ld2,ld3)         &
 !$omp& private(iend,jend,isize,jsize)
 #endif
           do jstart=1,nn,nb
@@ -54,12 +54,13 @@
              jsize = (jend-jstart+1)
              
           call GEMM( 'N','N', isize,jsize,kk,                           &
-     &      alpha, A1(istart,1),ld1, X(1,jstart), ld2,                   &
-     &      beta,  Y(istart,jstart), ld3 )
+     &      alphabeta(1), A1(istart,1),ld1, X(1,jstart), ld2,           &
+     &      alphabeta(2),  Y(istart,jstart), ld3 )
           enddo
           enddo
 
 #ifdef _OPENACC
+!$acc end loop
 !$acc end kernels
 #elif OMP_TARGET
 !$omp end target teams

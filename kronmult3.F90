@@ -17,7 +17,7 @@
 
       integer :: i,nv
       integer :: mm,nn,kk,ld1,ld2,ld3
-      ZTYPE :: alpha, beta
+      ZTYPE, DIMENSION(2) :: alphabeta
       ZTYPE :: W(ncol3*ncol2*nrow1,nvec)
 
 ! ---------------------------------------------
@@ -30,18 +30,18 @@
         mm = ncol3*ncol2
         nn = nrow1
         kk = ncol1
-        alpha = 1
-        beta = 0
+        alphabeta(1) = 1 ! alpha
+        alphabeta(2) = 0 ! beta
         ld1 = mm
         ld2 = ldA1
         ld3 = mm
 
 #ifdef _OPENACC
 !$acc  data pcopyin(A1,A2,A3,X)  pcopyout(Y) create(W)                   &
-!$acc& pcopyin(mm,nn,kk,alpha,beta,ld1,ld2,ld3)
+!$acc& pcopyin(mm,nn,kk,alphabeta,ld1,ld2,ld3)
 #elif OMP_TARGET
 !$omp target data map(to:A1,A2,A3,X) map(from:Y) map(alloc:W)            &
-!$omp& map(to:mm,nn,kk,alpha,beta,ld1,ld2,ld3)
+!$omp& map(to:mm,nn,kk,alphabeta,ld1,ld2,ld3)
 #endif
 
 
@@ -53,16 +53,17 @@
 !$omp target teams 
 !$omp distribute                                                          
 #else
-!$omp parallel  do                                                       &
-!$omp& shared(mm,nn,kk,alpha,beta,ld1,ld2,ld3)                           &
+!$omp parallel do                                                       &
+!$omp& shared(mm,nn,kk,alphabeta,ld1,ld2,ld3)                           &
 !$omp& shared(X,A1,W)
 #endif
       do i=1,nvec
         call GEMM('N','T',mm,nn,kk,                                     &
-     &         alpha, X(1,i),ld1, A1, ld2,                               &
-     &         beta, W(1,i), ld3 )
+     &         alphabeta(1), X(1,i),ld1, A1, ld2,                               &
+     &         alphabeta(2), W(1,i), ld3 )
       enddo
 #ifdef _OPENACC
+!$acc end loop
 !$acc end kernels
 #elif OMP_TARGET
 !$omp end target teams

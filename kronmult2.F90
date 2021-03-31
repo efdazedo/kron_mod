@@ -22,7 +22,7 @@
 
       integer :: i, nv
       integer :: mm,nn,kk,ld1,ld2,ld3
-      ZTYPE :: alpha,beta
+      ZTYPE, DIMENSION(2) :: alphabeta
 
 ! -------------------------------
 ! perform Wi = Xi * transpose(A1)
@@ -35,15 +35,15 @@
          ld1 = mm
          ld2 = ldA1
          ld3 = mm
-         alpha = 1
-         beta = 0
+         alphabeta(1) = 1 ! alpha
+         alphabeta(2) = 0 ! beta
 
 #ifdef _OPENACC
 !$acc data pcopyin(A1,A2,X) create(W) pcopyout(Y)                        &
-!$acc& copyin(mm,nn,kk,ld1,ld2,ld3,alpha,beta)
+!$acc& copyin(mm,nn,kk,ld1,ld2,ld3,alphabeta)
 #elif OMP_TARGET
 !$omp target data map(to:A1,A2,X) map(alloc:W) map(from:Y)               &
-!$omp& map(to:mm,nn,kk,ld1,ld2,ld3,alpha,beta)
+!$omp& map(to:mm,nn,kk,ld1,ld2,ld3,alphabeta)
 #endif
 
 
@@ -51,21 +51,22 @@
 
 #ifdef _OPENACC
 !$acc kernels present(A1,X,W)
-!$acc loop gang                                                           
+!$acc loop gang independent
 #elif OMP_TARGET
 !$omp target teams 
 !$omp distribute                                                          
 #else
-!$omp  parallel  shared(A1,X,W)                                         &
-!$omp& firstprivate(mm,nn,kk,ld1,ld2,ld3,alpha,beta)
+!$omp  parallel shared(A1,X,W)                                            &
+!$omp& firstprivate(mm,nn,kk,ld1,ld2,ld3,alphabeta)
 !$omp do                                                          
 #endif
       do i=1,nvec
          call GEMM( 'N', 'T', mm,nn,kk,                                  &
-     &     alpha, X(1,i), ld1, A1, ld2,                                  &
-     &     beta, W(1,i), ld3 )
+     &     alphabeta(1), X(1,i), ld1, A1, ld2,                           &
+     &     alphabeta(2), W(1,i), ld3 )
       enddo
 #ifdef _OPENACC
+!$acc end loop
 !$acc end kernels
 #elif OMP_TARGET
 !$omp end target teams
